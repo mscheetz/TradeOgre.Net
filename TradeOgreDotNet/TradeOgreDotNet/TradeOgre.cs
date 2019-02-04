@@ -87,7 +87,7 @@ namespace TradeOgreDotNet
             body.Add("quantity", quantity);
             body.Add("price", price);
 
-            var response = await base.PostRequest<OrderResponse>(endpoint, body);
+            var response = await base.PostRequest<OrderResponse>(endpoint, body, true);
 
             return response;
         }
@@ -99,7 +99,7 @@ namespace TradeOgreDotNet
             var body = new SortedDictionary<string, object>();
             body.Add("uuid", orderId);
 
-            var response = await base.PostRequest<ResponseBase>(endpoint, body);
+            var response = await base.PostRequest<ResponseBase>(endpoint, body, true);
 
             return response.Success;
         }
@@ -120,7 +120,7 @@ namespace TradeOgreDotNet
             var body = new SortedDictionary<string, object>();
             body.Add("market", pair);
 
-            var response = await base.PostRequest<Order[]>(endpoint, body);
+            var response = await base.PostRequest<Order[]>(endpoint, body, true);
 
             return response;
         }
@@ -141,7 +141,7 @@ namespace TradeOgreDotNet
             var body = new SortedDictionary<string, object>();
             body.Add("currency", symbol);
 
-            var response = await base.PostRequest<CurrencyBalance>(endpoint, body);
+            var response = await base.PostRequest<CurrencyBalance>(endpoint, body, true);
 
             return response;
         }
