@@ -5,7 +5,7 @@
 // <author name="Matt Scheetz" date="2/2/2019 10:47:46 PM" />
 // -----------------------------------------------------------------------------
 
-namespace TradeOgreDotNet
+namespace TradeOgre.Net
 {
     #region Usings
 
@@ -13,8 +13,7 @@ namespace TradeOgreDotNet
     using System.Collections.Generic;
     using System.Text;
     using System.Threading.Tasks;
-    using TradeOgreDotNet.Contracts;
-
+    using global::TradeOgre.Net.Contracts;
 
     #endregion Usings
 
@@ -24,7 +23,7 @@ namespace TradeOgreDotNet
 
         Task<Dictionary<string, Ticker>> GetMarkets();
 
-        Task<OrderBook> GetOrderBook(string pair);
+        Task<OrderBookExchange> GetOrderBook(string pair);
 
         Task<Ticker> GetTicker(string pair);
 

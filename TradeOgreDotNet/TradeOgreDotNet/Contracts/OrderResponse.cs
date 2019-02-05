@@ -5,15 +5,11 @@
 // <author name="Matt Scheetz" date="2/2/2019 10:23:01 PM" />
 // -----------------------------------------------------------------------------
 
-namespace TradeOgreDotNet.Contracts
+namespace TradeOgre.Net.Contracts
 {
-    using Newtonsoft.Json;
     #region Usings
 
-    using System;
-    using System.Collections.Generic;
-    using System.Text;
-
+    using Newtonsoft.Json;
 
     #endregion Usings
 

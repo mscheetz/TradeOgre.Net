@@ -2,30 +2,24 @@
 // <copyright file="OrderBook" company="Matt Scheetz">
 //     Copyright (c) Matt Scheetz All Rights Reserved
 // </copyright>
-// <author name="Matt Scheetz" date="2/2/2019 9:56:17 PM" />
+// <author name="Matt Scheetz" date="2/4/2019 7:58:59 PM" />
 // -----------------------------------------------------------------------------
 
-namespace TradeOgreDotNet.Contracts
+namespace TradeOgre.Net.Contracts
 {
-    using Newtonsoft.Json;
     #region Usings
 
-    using System;
     using System.Collections.Generic;
-    using System.Text;
-
 
     #endregion Usings
 
-    public class OrderBook : ResponseBase
+    public class OrderBook
     {
         #region Properties
 
-        [JsonProperty(PropertyName = "buy")]
-        public Dictionary<decimal, decimal> Buy { get; set; }
+        public List<OrderBookDetail> Buys { get; set; }
 
-        [JsonProperty(PropertyName = "sell")]
-        public Dictionary<decimal, decimal> Sell { get; set; }
+        public List<OrderBookDetail> Sells { get; set; }
 
         #endregion Properties
     }

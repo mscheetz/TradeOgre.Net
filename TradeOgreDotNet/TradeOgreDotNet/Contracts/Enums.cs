@@ -5,17 +5,8 @@
 // <author name="Matt Scheetz" date="2/2/2019 10:08:57 PM" />
 // -----------------------------------------------------------------------------
 
-namespace TradeOgreDotNet.Contracts
+namespace TradeOgre.Net.Contracts
 {
-    #region Usings
-
-    using System;
-    using System.Collections.Generic;
-    using System.Text;
-
-
-    #endregion Usings
-
     public enum Side
     {
         Buy,

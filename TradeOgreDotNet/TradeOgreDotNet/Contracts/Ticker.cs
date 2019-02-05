@@ -5,7 +5,7 @@
 // <author name="Matt Scheetz" date="2/2/2019 9:47:33 PM" />
 // -----------------------------------------------------------------------------
 
-namespace TradeOgreDotNet.Contracts
+namespace TradeOgre.Net.Contracts
 {
     #region Usings
 
@@ -19,7 +19,7 @@ namespace TradeOgreDotNet.Contracts
 
         public string TradingPair { get; set; }
 
-        [JsonProperty(PropertyName = "intialprice")]
+        [JsonProperty(PropertyName = "initialprice")]
         public decimal InitialPrice { get; set; }
 
         [JsonProperty(PropertyName = "price")]
@@ -41,5 +41,23 @@ namespace TradeOgreDotNet.Contracts
         public decimal Ask { get; set; }
 
         #endregion Properties
+
+        #region Constructor
+
+        public Ticker()
+        { }
+
+        public Ticker(Ticker ticker)
+        {
+            this.Ask = ticker.Ask;
+            this.Bid = ticker.Bid;
+            this.High = ticker.High;
+            this.InitialPrice = ticker.InitialPrice;
+            this.Low = ticker.Low;
+            this.Price = ticker.Price;
+            this.Volume = ticker.Volume;
+        }
+
+        #endregion Constructor
     }
 }

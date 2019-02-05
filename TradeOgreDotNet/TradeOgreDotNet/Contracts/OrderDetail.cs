@@ -5,7 +5,7 @@
 // <author name="Matt Scheetz" date="2/2/2019 10:35:25 PM" />
 // -----------------------------------------------------------------------------
 
-namespace TradeOgreDotNet.Contracts
+namespace TradeOgre.Net.Contracts
 {
     #region Usings
 

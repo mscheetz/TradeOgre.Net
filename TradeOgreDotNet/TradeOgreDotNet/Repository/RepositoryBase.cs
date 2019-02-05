@@ -5,23 +5,11 @@
 // <author name="Matt Scheetz" date="2/2/2019 9:39:56 PM" />
 // -----------------------------------------------------------------------------
 
-namespace TradeOgreDotNet.Repository
+namespace TradeOgre.Net.Repository
 {
     #region Usings
-
-    using System;
-    using System.Collections.Generic;
-    using System.Text;
-
-
-    #endregion Usings
-
-    using TradeOgreDotNet.Contracts;
-    using TradeOgreDotNet.Core;
-//    using Bilaxy.Net.Interface;
+    
     using DateTimeHelpers;
-    using RESTApiAccess;
-    using RESTApiAccess.Interface;
     using System;
     using System.Collections.Generic;
     using System.Net.Http;
@@ -31,14 +19,14 @@ namespace TradeOgreDotNet.Repository
     using System.IO;
     using Newtonsoft.Json;
     using System.Net;
+    using global::TradeOgre.Net.Contracts;
 
-#endregion Usings
+    #endregion Usings
 
     public class RepositoryBase
     {
         #region Properties
 
-        private IRESTRepository _restRepo;
         private string baseUrl = "https://tradeogre.com/api/v1";
         private ApiCredentials _apiCreds;
         private DateTimeHelper _dtHelper;
@@ -63,7 +51,6 @@ namespace TradeOgreDotNet.Repository
 
         private void LoadBase()
         {
-            _restRepo = new RESTRepository();
             _dtHelper = new DateTimeHelper();
         }
 
@@ -82,7 +69,7 @@ namespace TradeOgreDotNet.Repository
         /// <returns>Object from response</returns>
         public async Task<T> GetRequest<T>(string endpoint, SortedDictionary<string, object> parms, bool secure = false)
         {
-            return await OnGetRequest<T>(endpoint);
+            return await OnGetRequest<T>(endpoint, secure);
         }
 
         /// <summary>
@@ -94,7 +81,7 @@ namespace TradeOgreDotNet.Repository
         /// <returns>Object from response</returns>
         public async Task<T> GetRequest<T>(string endpoint, bool secure = false)
         {
-            return await OnGetRequest<T>(endpoint);
+            return await OnGetRequest<T>(endpoint, secure);
         }
 
         /// <summary>
@@ -103,13 +90,13 @@ namespace TradeOgreDotNet.Repository
         /// <typeparam name="T">Object to return</typeparam>
         /// <param name="endpoint">Endpoint of request</param>
         /// <returns>Object from response</returns>
-        private async Task<T> OnGetRequest<T>(string endpoint)
+        private async Task<T> OnGetRequest<T>(string endpoint, bool secure = false)
         {
             var url = baseUrl + endpoint;
 
             try
             {
-                var response = await Get<T>(url);
+                var response = await Get<T>(url, secure);
 
                 return response;
             }
@@ -148,13 +135,13 @@ namespace TradeOgreDotNet.Repository
         /// <param name="endpoint">Endpoint of request</param>
         /// <param name="body">Request body data</param>
         /// <returns>Object from response</returns>
-        public async Task<T> PostRequest<T>(string endpoint)
+        public async Task<T> PostRequest<T>(string endpoint, bool secure = true)
         {
             var url = baseUrl + endpoint;
 
             try
             {
-                var response = await Post<T>(url);
+                var response = await Post<T>(url, secure);
 
                 return response;
             }
@@ -171,13 +158,13 @@ namespace TradeOgreDotNet.Repository
         /// <param name="endpoint">Endpoint of request</param>
         /// <param name="body">Request body data</param>
         /// <returns>Object from response</returns>
-        public async Task<T> PostRequest<T>(string endpoint, SortedDictionary<string, object> body, bool secure)
+        public async Task<T> PostRequest<T>(string endpoint, Dictionary<string, object> body, bool secure = true)
         {
             var url = baseUrl + endpoint;
 
             try
             {
-                var response = await Post<T, SortedDictionary<string, object>>(url, body, secure);
+                var response = await Post<T, Dictionary<string, object>>(url, body, secure);
 
                 return response;
             }
@@ -250,7 +237,7 @@ namespace TradeOgreDotNet.Repository
         /// <param name="url">Url to access</param>
         /// <param name="data">Data object being sent</param>
         /// <returns>Type requested</returns>
-        public async Task<T> Post<T, U>(string url, U data, bool secure = false)
+        public async Task<T> Post<T, U>(string url, U data, bool secure = true)
         {
             using (var client = new HttpClient())
             {
@@ -260,6 +247,8 @@ namespace TradeOgreDotNet.Repository
                     client.DefaultRequestHeaders.Authorization =
                         new AuthenticationHeaderValue("Basic", Convert.ToBase64String(secureBytes));
                 }
+
+                var json = JsonConvert.SerializeObject(data);
 
                 var content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
 
@@ -296,7 +285,7 @@ namespace TradeOgreDotNet.Repository
         /// <typeparam name="T">Type to return</typeparam>
         /// <param name="url">Url to access</param>
         /// <returns>Type requested</returns>
-        public async Task<T> Post<T>(string url, bool secure = false)
+        public async Task<T> Post<T>(string url, bool secure = true)
         {
             using (var client = new HttpClient())
             {

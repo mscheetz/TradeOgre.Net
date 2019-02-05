@@ -5,17 +5,8 @@
 // <author name="Matt Scheetz" date="2/2/2019 9:41:49 PM" />
 // -----------------------------------------------------------------------------
 
-namespace TradeOgreDotNet.Contracts
+namespace TradeOgre.Net.Contracts
 {
-    #region Usings
-
-    using System;
-    using System.Collections.Generic;
-    using System.Text;
-
-
-    #endregion Usings
-
     public class ApiCredentials
     {
         #region Properties
