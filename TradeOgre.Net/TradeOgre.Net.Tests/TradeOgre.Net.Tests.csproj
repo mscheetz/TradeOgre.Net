@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TradeOgreDotNet\TradeOgre.Net.csproj" />
+    <ProjectReference Include="..\TradeOgre.Net\TradeOgre.Net.csproj" />
   </ItemGroup>
 
 </Project>

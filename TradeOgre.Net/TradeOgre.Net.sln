@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.168
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TradeOgre.Net", "TradeOgreDotNet\TradeOgre.Net.csproj", "{5A5AF2E0-9FA3-481C-AA8F-FE5B3393279A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TradeOgre.Net", "TradeOgre.Net\TradeOgre.Net.csproj", "{5A5AF2E0-9FA3-481C-AA8F-FE5B3393279A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Api", "Api", "{687DA8F0-C6DE-4171-A27E-63FC3F087664}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{FD41FA0D-E45C-4B29-AAEF-D5ACECD96FDA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TradeOgre.Net.Tests", "TradeOgreDotNet.Tests\TradeOgre.Net.Tests.csproj", "{03F90365-A7B9-4467-9D12-107CABAE3E5C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TradeOgre.Net.Tests", "TradeOgre.Net.Tests\TradeOgre.Net.Tests.csproj", "{03F90365-A7B9-4467-9D12-107CABAE3E5C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
