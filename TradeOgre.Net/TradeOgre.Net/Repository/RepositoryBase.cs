@@ -8,17 +8,12 @@
 namespace TradeOgre.Net.Repository
 {
     #region Usings
-    
+
     using DateTimeHelpers;
     using System;
     using System.Collections.Generic;
-    using System.Net.Http;
-    using System.Text;
     using System.Threading.Tasks;
-    using System.Net.Http.Headers;
-    using System.IO;
     using Newtonsoft.Json;
-    using System.Net;
     using global::TradeOgre.Net.Contracts;
     using RESTApiAccess.Interface;
     using RESTApiAccess;
@@ -41,24 +36,38 @@ namespace TradeOgre.Net.Repository
 
         #endregion Properties
 
+        /// <summary>
+        /// Constructor for public endpoints
+        /// </summary>
         public RepositoryBase()
         {
             LoadBase();
         }
 
+        /// <summary>
+        /// Constructor for secure endpoints
+        /// </summary>
+        /// <param name="apiCredentials">Api credentials</param>
         public RepositoryBase(ApiCredentials apiCredentials)
         {
             _apiCreds = apiCredentials;
             LoadBase();
         }
 
+        /// <summary>
+        /// Load repository base
+        /// </summary>
         private void LoadBase()
         {
             _rest = new RESTRepository();
             _dtHelper = new DateTimeHelper();
         }
 
-        public void SetApiKey(ApiCredentials apiCredentials)
+        /// <summary>
+        /// Set api credentials
+        /// </summary>
+        /// <param name="apiCredentials">Api Credentials to set</param>
+        public void SetApiCredentials(ApiCredentials apiCredentials)
         {
             _apiCreds = apiCredentials;
         }
@@ -100,14 +109,17 @@ namespace TradeOgre.Net.Repository
         /// </summary>
         /// <typeparam name="T">Object to return</typeparam>
         /// <param name="endpoint">Endpoint of request</param>
+        /// <param name="secure">Secure endpoint?</param>
         /// <returns>Object from response</returns>
-        private async Task<T> OnGet<T>(string endpoint, bool secure = false)
+        private async Task<T> OnGet<T>(string endpoint, bool secure)
         {
             var url = baseUrl + endpoint;
 
             try
             {
-                var response = await _rest.GetApiStream<T>(url, _apiCreds.ApiKey, _apiCreds.ApiSecret);
+                var response = secure
+                    ? await _rest.GetApiStream<T>(url, _apiCreds.ApiKey, _apiCreds.ApiSecret)
+                    : await _rest.GetApiStream<T>(url);
 
                 return response;
             }
@@ -122,7 +134,7 @@ namespace TradeOgre.Net.Repository
         /// </summary>
         /// <typeparam name="T">Object to return</typeparam>
         /// <param name="endpoint">Endpoint of request</param>
-        /// <param name="body">Request body data</param>
+        /// <param name="secure">Secure endpoint?</param>
         /// <returns>Object from response</returns>
         public async Task<T> Post<T>(string endpoint, bool secure = true)
         {
@@ -130,7 +142,9 @@ namespace TradeOgre.Net.Repository
 
             try
             {
-                var response = await _rest.PostApi<T>(url, _apiCreds.ApiKey, _apiCreds.ApiSecret);
+                var response = secure 
+                    ? await _rest.PostApi<T>(url, _apiCreds.ApiKey, _apiCreds.ApiSecret)
+                    : await _rest.PostApi<T>(url);
 
                 return response;
             }
@@ -146,14 +160,17 @@ namespace TradeOgre.Net.Repository
         /// <typeparam name="T">Object to return</typeparam>
         /// <param name="endpoint">Endpoint of request</param>
         /// <param name="body">Request body data</param>
+        /// <param name="secure">Secure endpoint?</param>
         /// <returns>Object from response</returns>
-        public async Task<T> Post<T>(string endpoint, Dictionary<string, object> body, bool secure = true)
+        public async Task<T> Post<T, U>(string endpoint, U body, bool secure = true)
         {
             var url = baseUrl + endpoint;
 
             try
             {
-                var response = await _rest.PostApi<T, Dictionary<string, object>>(url, body, _apiCreds.ApiKey, _apiCreds.ApiSecret);
+                var response = secure 
+                    ? await _rest.PostApi<T, U>(url, body, _apiCreds.ApiKey, _apiCreds.ApiSecret)
+                    : await _rest.PostApi<T, U>(url, body);
 
                 return response;
             }
@@ -163,6 +180,11 @@ namespace TradeOgre.Net.Repository
             }
         }
 
+        /// <summary>
+        /// Convert a dictionary to a querystring
+        /// </summary>
+        /// <param name="data">Dictionary to convert</param>
+        /// <returns>String of dictionary data</returns>
         private string DictionaryToQueryString(SortedDictionary<string, object> data)
         {
             var queryString = string.Empty;

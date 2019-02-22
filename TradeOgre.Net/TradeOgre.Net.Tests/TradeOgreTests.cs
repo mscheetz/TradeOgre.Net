@@ -73,6 +73,14 @@ namespace TradeOgre.Net.Tests
         }
 
         [Fact]
+        public void GetMarketPairs_Test()
+        {
+            var markets = _service.GetMarketPairs().Result;
+
+            Assert.NotNull(markets);
+        }
+
+        [Fact]
         public void GetOrderBook_Test()
         {
             var pair = "BTC-LTC";

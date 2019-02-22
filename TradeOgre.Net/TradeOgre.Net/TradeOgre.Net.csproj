@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Version>0.1.0</Version>
+    <Version>0.1.1</Version>
     <Authors>Matt Scheetz</Authors>
     <Company>Matt Scheetz</Company>
     <Description>.Net standard wrapper for TradeOgre exchange's API</Description>
@@ -11,7 +11,7 @@
     <PackageProjectUrl>https://github.com/mscheetz/TradeOgre.Net</PackageProjectUrl>  
     <RepositoryUrl>https://github.com/mscheetz/TradeOgre.Net</RepositoryUrl>  
     <PackageTags>bitcoin ethereum tradeogre cryptocurrency exchange</PackageTags>  
-    <PackageReleaseNotes>.Net standard wrapper for TradeOgre exchange's API</PackageReleaseNotes>    
+    <PackageReleaseNotes>Added comments and available markets endpoint</PackageReleaseNotes>    
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

@@ -21,6 +21,28 @@ namespace TradeOgre.Net
     {
         #region Public Api
 
+        /// <summary>
+        /// Get all market pairs
+        /// </summary>
+        /// <returns>Collection of trading pairs</returns>
+        public static async Task<string[]> GetMarketPairs(this ITradeOgre service)
+        {
+            var markets = new List<string>();
+
+            var exchangeMkts = await service.GetMarkets();
+
+            foreach(var market in exchangeMkts)
+            {
+                markets.Add(market.Key);
+            }
+
+            return markets.ToArray();
+        }
+
+        /// <summary>
+        /// Get converted Markets
+        /// </summary>
+        /// <returns>Collection of Ticker objects</returns>
         public static async Task<List<Ticker>> GetMarketsConverted(this ITradeOgre service)
         {
             var tickers = new List<Ticker>();
@@ -38,6 +60,11 @@ namespace TradeOgre.Net
             return tickers;
         }
 
+        /// <summary>
+        /// Get converted Order Book
+        /// </summary>
+        /// <param name="pair">Trading pair</param>
+        /// <returns>OrderBook object</returns>
         public static async Task<OrderBook> GetOrderBookConverted(this ITradeOgre service, string pair)
         {
             var buys = new List<OrderBookDetail>();
@@ -63,6 +90,14 @@ namespace TradeOgre.Net
 
         #region Private Api
 
+        /// <summary>
+        /// Place a Limit order
+        /// </summary>
+        /// <param name="pair">Trading pair</param>
+        /// <param name="side">Trade side</param>
+        /// <param name="price">Order price</param>
+        /// <param name="quantity">Order quantity</param>
+        /// <returns>OrderResponse object</returns>
         public static async Task<OrderResponse> LimitOrder(this ITradeOgre service, string pair, Side side, decimal price, decimal quantity)
         {
             var order = await service.PlaceOrder(pair, side, price, quantity);
@@ -70,6 +105,13 @@ namespace TradeOgre.Net
             return order;
         }
 
+        /// <summary>
+        /// Place a Market order
+        /// </summary>
+        /// <param name="pair">Trading pair</param>
+        /// <param name="side">Trade side</param>
+        /// <param name="quantity">Order quantity</param>
+        /// <returns>OrderResponse object</returns>
         public static async Task<OrderResponse> MarketOrder(this ITradeOgre service, string pair, Side side, decimal quantity)
         {
             var ticker = await service.GetTicker(pair);

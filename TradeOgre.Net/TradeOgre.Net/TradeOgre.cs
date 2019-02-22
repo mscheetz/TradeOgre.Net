@@ -9,9 +9,7 @@ namespace TradeOgre.Net
 {
     #region Usings
 
-    using System;
     using System.Collections.Generic;
-    using System.Text;
     using System.Threading.Tasks;
     using global::TradeOgre.Net.Contracts;
     using global::TradeOgre.Net.Repository;
@@ -39,6 +37,10 @@ namespace TradeOgre.Net
 
         #region Public Api
 
+        /// <summary>
+        /// Retrieve a listing of all markets and basic information including current price, volume, high, low, bid and ask.
+        /// </summary>
+        /// <returns>Dictionary of markets and ticker data</returns>
         public async Task<Dictionary<string, Ticker>> GetMarkets()
         {
             var endpoint = @"/markets";
@@ -56,6 +58,11 @@ namespace TradeOgre.Net
             return marketDictionary;
         }
 
+        /// <summary>
+        /// Retrieve the current order book for a trading pair.
+        /// </summary>
+        /// <param name="pair">Trading pair</param>
+        /// <returns>OrderBook data</returns>
         public async Task<OrderBookExchange> GetOrderBook(string pair)
         {
             var endpoint = $@"/orders/{pair}";
@@ -64,6 +71,11 @@ namespace TradeOgre.Net
             return orderBook;
         }
 
+        /// <summary>
+        /// Retrieve the ticker for a trading pair, volume, high, and low are in the last 24 hours, initial price is the price from 24 hours ago.
+        /// </summary>
+        /// <param name="pair">Trading pair</param>
+        /// <returns>Ticker object</returns>
         public async Task<Ticker> GetTicker(string pair)
         {
             var endpoint = $@"/ticker/{pair}";
@@ -74,6 +86,11 @@ namespace TradeOgre.Net
             return ticker;
         }
 
+        /// <summary>
+        /// Retrieve the history of the last trades on a trading pair limited to 100 of the most recent trades. The date is a Unix UTC timestamp.
+        /// </summary>
+        /// <param name="pair">Trading pair</param>
+        /// <returns>Collection of TradeHistory</returns>
         public async Task<TradeHistory[]> GetTradeHistory(string pair)
         {
             var endpoint = $@"/history/{pair}";
@@ -86,6 +103,14 @@ namespace TradeOgre.Net
 
         #region Private Api
 
+        /// <summary>
+        /// Place an order
+        /// </summary>
+        /// <param name="pair">Trading pair</param>
+        /// <param name="side">Trade side</param>
+        /// <param name="price">Order price</param>
+        /// <param name="quantity">Order quantity</param>
+        /// <returns>Order response object</returns>
         public async Task<OrderResponse> PlaceOrder(string pair, Side side, decimal price, decimal quantity)
         {
             var endpoint = side == Side.Buy ? $@"/order/buy" : $@"/order/sell";
@@ -95,11 +120,16 @@ namespace TradeOgre.Net
             body.Add("quantity", quantity);
             body.Add("price", price);
 
-            var response = await base.Post<OrderResponse>(endpoint, body);
+            var response = await base.Post<OrderResponse, Dictionary<string, object>>(endpoint, body);
 
             return response;
         }
 
+        /// <summary>
+        /// Cancel an order
+        /// </summary>
+        /// <param name="orderId">Order Id to cancel</param>
+        /// <returns>Boolean when complete</returns>
         public async Task<bool> CancelOrder(string orderId)
         {
             var endpoint = $@"/order/cancel";
@@ -107,11 +137,15 @@ namespace TradeOgre.Net
             var body = new Dictionary<string, object>();
             body.Add("uuid", orderId);
 
-            var response = await base.Post<ResponseBase>(endpoint, body);
+            var response = await base.Post<ResponseBase, Dictionary<string, object>>(endpoint, body);
 
             return response.Success;
         }
 
+        /// <summary>
+        /// Get all orders for current account
+        /// </summary>
+        /// <returns>Collection of order objects</returns>
         public async Task<Order[]> GetOrders()
         {
             var endpoint = $@"/account/orders";
@@ -121,6 +155,11 @@ namespace TradeOgre.Net
             return response;
         }
 
+        /// <summary>
+        /// Get all orders for a trading pair for current account
+        /// </summary>
+        /// <param name="pair">Trading pair</param>
+        /// <returns>Collection of order objects</returns>
         public async Task<Order[]> GetOrders(string pair)
         {
             var endpoint = $@"/account/orders";
@@ -128,11 +167,16 @@ namespace TradeOgre.Net
             var body = new Dictionary<string, object>();
             body.Add("market", pair);
 
-            var response = await base.Post<Order[]>(endpoint, body);
+            var response = await base.Post<Order[], Dictionary<string, object>>(endpoint, body);
 
             return response;
         }
 
+        /// <summary>
+        /// Get an order
+        /// </summary>
+        /// <param name="orderId">Order Id to find</param>
+        /// <returns>OrderDetail object</returns>
         public async Task<OrderDetail> GetOrder(string orderId)
         {
             var endpoint = $@"/account/order/{orderId}";
@@ -142,6 +186,11 @@ namespace TradeOgre.Net
             return response;
         }
 
+        /// <summary>
+        /// Get balance for a currency for current account
+        /// </summary>
+        /// <param name="symbol">Symbol of a currency</param>
+        /// <returns>Currency balance object</returns>
         public async Task<CurrencyBalance> GetBalance(string symbol)
         {
             var endpoint = $@"/account/balance";
@@ -149,11 +198,15 @@ namespace TradeOgre.Net
             var body = new Dictionary<string, object>();
             body.Add("currency", symbol);
 
-            var response = await base.Post<CurrencyBalance>(endpoint, body);
+            var response = await base.Post<CurrencyBalance, Dictionary<string, object>>(endpoint, body);
 
             return response;
         }
 
+        /// <summary>
+        /// Get all balances for current account
+        /// </summary>
+        /// <returns>CurrencyBalances object</returns>
         public async Task<CurrencyBalances> GetBalances()
         {
             var endpoint = $@"/account/balances";
