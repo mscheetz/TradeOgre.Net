@@ -42,7 +42,7 @@ namespace TradeOgre.Net
         public async Task<Dictionary<string, Ticker>> GetMarkets()
         {
             var endpoint = @"/markets";
-            var markets = await base.GetRequest<Dictionary<string, Ticker>[]>(endpoint);
+            var markets = await base.Get<Dictionary<string, Ticker>[]>(endpoint);
 
             var marketDictionary = new Dictionary<string, Ticker>();
             foreach(var market in markets)
@@ -59,7 +59,7 @@ namespace TradeOgre.Net
         public async Task<OrderBookExchange> GetOrderBook(string pair)
         {
             var endpoint = $@"/orders/{pair}";
-            var orderBook = await base.GetRequest<OrderBookExchange>(endpoint);
+            var orderBook = await base.Get<OrderBookExchange>(endpoint);
 
             return orderBook;
         }
@@ -67,7 +67,7 @@ namespace TradeOgre.Net
         public async Task<Ticker> GetTicker(string pair)
         {
             var endpoint = $@"/ticker/{pair}";
-            var ticker = await base.GetRequest<Ticker>(endpoint);
+            var ticker = await base.Get<Ticker>(endpoint);
 
             ticker.TradingPair = pair;
 
@@ -77,7 +77,7 @@ namespace TradeOgre.Net
         public async Task<TradeHistory[]> GetTradeHistory(string pair)
         {
             var endpoint = $@"/history/{pair}";
-            var ticker = await base.GetRequest<TradeHistory[]>(endpoint);
+            var ticker = await base.Get<TradeHistory[]>(endpoint);
             
             return ticker;
         }
@@ -95,7 +95,7 @@ namespace TradeOgre.Net
             body.Add("quantity", quantity);
             body.Add("price", price);
 
-            var response = await base.PostRequest<OrderResponse>(endpoint, body);
+            var response = await base.Post<OrderResponse>(endpoint, body);
 
             return response;
         }
@@ -107,7 +107,7 @@ namespace TradeOgre.Net
             var body = new Dictionary<string, object>();
             body.Add("uuid", orderId);
 
-            var response = await base.PostRequest<ResponseBase>(endpoint, body);
+            var response = await base.Post<ResponseBase>(endpoint, body);
 
             return response.Success;
         }
@@ -116,7 +116,7 @@ namespace TradeOgre.Net
         {
             var endpoint = $@"/account/orders";
 
-            var response = await base.PostRequest<Order[]>(endpoint);
+            var response = await base.Post<Order[]>(endpoint);
 
             return response;
         }
@@ -128,7 +128,7 @@ namespace TradeOgre.Net
             var body = new Dictionary<string, object>();
             body.Add("market", pair);
 
-            var response = await base.PostRequest<Order[]>(endpoint, body);
+            var response = await base.Post<Order[]>(endpoint, body);
 
             return response;
         }
@@ -137,7 +137,7 @@ namespace TradeOgre.Net
         {
             var endpoint = $@"/account/order/{orderId}";
 
-            var response = await base.GetRequest<OrderDetail>(endpoint, true);
+            var response = await base.Get<OrderDetail>(endpoint, true);
 
             return response;
         }
@@ -149,7 +149,7 @@ namespace TradeOgre.Net
             var body = new Dictionary<string, object>();
             body.Add("currency", symbol);
 
-            var response = await base.PostRequest<CurrencyBalance>(endpoint, body);
+            var response = await base.Post<CurrencyBalance>(endpoint, body);
 
             return response;
         }
@@ -158,7 +158,7 @@ namespace TradeOgre.Net
         {
             var endpoint = $@"/account/balances";
 
-            var response = await base.GetRequest<CurrencyBalances>(endpoint, true);
+            var response = await base.Get<CurrencyBalances>(endpoint, true);
 
             return response;
         }

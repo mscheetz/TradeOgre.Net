@@ -20,6 +20,8 @@ namespace TradeOgre.Net.Repository
     using Newtonsoft.Json;
     using System.Net;
     using global::TradeOgre.Net.Contracts;
+    using RESTApiAccess.Interface;
+    using RESTApiAccess;
 
     #endregion Usings
 
@@ -28,6 +30,7 @@ namespace TradeOgre.Net.Repository
         #region Properties
 
         private string baseUrl = "https://tradeogre.com/api/v1";
+        private IRESTRepository _rest;
         private ApiCredentials _apiCreds;
         private DateTimeHelper _dtHelper;
         JsonSerializerSettings settings = new JsonSerializerSettings
@@ -51,6 +54,7 @@ namespace TradeOgre.Net.Repository
 
         private void LoadBase()
         {
+            _rest = new RESTRepository();
             _dtHelper = new DateTimeHelper();
         }
 
@@ -67,9 +71,16 @@ namespace TradeOgre.Net.Repository
         /// <param name="parms">Parameters to pass</param>
         /// <param name="secure">Secure endpoint?</param>
         /// <returns>Object from response</returns>
-        public async Task<T> GetRequest<T>(string endpoint, SortedDictionary<string, object> parms, bool secure = false)
+        public async Task<T> Get<T>(string endpoint, SortedDictionary<string, object> parms, bool secure = false)
         {
-            return await OnGetRequest<T>(endpoint, secure);
+            var queryString = DictionaryToQueryString(parms);
+
+            if(!string.IsNullOrEmpty(queryString))
+            {
+                endpoint += $@"?{queryString}";
+            }
+
+            return await OnGet<T>(endpoint, secure);
         }
 
         /// <summary>
@@ -79,9 +90,9 @@ namespace TradeOgre.Net.Repository
         /// <param name="endpoint">Endpoint of request</param>
         /// <param name="secure">Secure endpoint?</param>
         /// <returns>Object from response</returns>
-        public async Task<T> GetRequest<T>(string endpoint, bool secure = false)
+        public async Task<T> Get<T>(string endpoint, bool secure = false)
         {
-            return await OnGetRequest<T>(endpoint, secure);
+            return await OnGet<T>(endpoint, secure);
         }
 
         /// <summary>
@@ -90,35 +101,13 @@ namespace TradeOgre.Net.Repository
         /// <typeparam name="T">Object to return</typeparam>
         /// <param name="endpoint">Endpoint of request</param>
         /// <returns>Object from response</returns>
-        private async Task<T> OnGetRequest<T>(string endpoint, bool secure = false)
+        private async Task<T> OnGet<T>(string endpoint, bool secure = false)
         {
             var url = baseUrl + endpoint;
 
             try
             {
-                var response = await Get<T>(url, secure);
-
-                return response;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-        }
-
-        /// <summary>
-        /// Initiate a Get request
-        /// </summary>
-        /// <typeparam name="T">Object to return</typeparam>
-        /// <param name="endpoint">Endpoint of request</param>
-        /// <returns>Object from response</returns>
-        public async Task<T> GetRequest<T>(string endpoint)
-        {
-            var url = baseUrl + endpoint;
-
-            try
-            {
-                var response = await Get<T>(url);
+                var response = await _rest.GetApiStream<T>(url, _apiCreds.ApiKey, _apiCreds.ApiSecret);
 
                 return response;
             }
@@ -135,13 +124,13 @@ namespace TradeOgre.Net.Repository
         /// <param name="endpoint">Endpoint of request</param>
         /// <param name="body">Request body data</param>
         /// <returns>Object from response</returns>
-        public async Task<T> PostRequest<T>(string endpoint, bool secure = true)
+        public async Task<T> Post<T>(string endpoint, bool secure = true)
         {
             var url = baseUrl + endpoint;
 
             try
             {
-                var response = await Post<T>(url, secure);
+                var response = await _rest.PostApi<T>(url, _apiCreds.ApiKey, _apiCreds.ApiSecret);
 
                 return response;
             }
@@ -158,13 +147,13 @@ namespace TradeOgre.Net.Repository
         /// <param name="endpoint">Endpoint of request</param>
         /// <param name="body">Request body data</param>
         /// <returns>Object from response</returns>
-        public async Task<T> PostRequest<T>(string endpoint, Dictionary<string, object> body, bool secure = true)
+        public async Task<T> Post<T>(string endpoint, Dictionary<string, object> body, bool secure = true)
         {
             var url = baseUrl + endpoint;
 
             try
             {
-                var response = await Post<T, Dictionary<string, object>>(url, body, secure);
+                var response = await _rest.PostApi<T, Dictionary<string, object>>(url, body, _apiCreds.ApiKey, _apiCreds.ApiSecret);
 
                 return response;
             }
@@ -174,173 +163,20 @@ namespace TradeOgre.Net.Repository
             }
         }
 
-        /// <summary>
-        /// Get call to api stream 
-        /// For large json responses
-        /// </summary>
-        /// <typeparam name="T">Type to return</typeparam>
-        /// <param name="url">Url to access</param>
-        /// <returns>Type requested</returns>
-        private async Task<T> Get<T>(string url, bool secure = false)
+        private string DictionaryToQueryString(SortedDictionary<string, object> data)
         {
-            using (var client = new HttpClient())
+            var queryString = string.Empty;
+
+            foreach(var kvp in data)
             {
-                if (secure)
+                if(!string.IsNullOrEmpty(queryString))
                 {
-                    var secureBytes = ASCIIEncoding.ASCII.GetBytes($"{_apiCreds.ApiKey}:{_apiCreds.ApiSecret}");
-                    client.DefaultRequestHeaders.Authorization =
-                        new AuthenticationHeaderValue("Basic", Convert.ToBase64String(secureBytes));
+                    queryString += @"&";
                 }
-
-                var responseMessage = String.Empty;
-                try
-                {
-                    var response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
-                    var sb = new StringBuilder();
-
-                    using (var stream = await response.Content.ReadAsStreamAsync())
-                    {
-                        using (var sr = new StreamReader(stream, Encoding.UTF8))
-                        {
-                            sb.Append(sr.ReadToEnd());
-                        }
-
-                        responseMessage = sb.ToString();
-                    }
-
-                    if (!StatusCodeSuccess(response.StatusCode))
-                    {
-                        throw new Exception(responseMessage);
-                    }
-
-                    try
-                    {
-                        return JsonConvert.DeserializeObject<T>(responseMessage, settings);
-                    }
-                    catch (Exception ex)
-                    {
-                        throw new Exception(ex.Message);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception(ex.Message);
-                }
+                queryString += $@"{kvp.Key}={kvp.Value.ToString()}";
             }
-        }
 
-        /// <summary>
-        /// Post call to api with data
-        /// </summary>
-        /// <typeparam name="T">Type to return</typeparam>
-        /// <typeparam name="U">Type to post</typeparam>
-        /// <param name="url">Url to access</param>
-        /// <param name="data">Data object being sent</param>
-        /// <returns>Type requested</returns>
-        public async Task<T> Post<T, U>(string url, U data, bool secure = true)
-        {
-            using (var client = new HttpClient())
-            {
-                if (secure)
-                {
-                    var secureBytes = ASCIIEncoding.ASCII.GetBytes($"{_apiCreds.ApiKey}:{_apiCreds.ApiSecret}");
-                    client.DefaultRequestHeaders.Authorization =
-                        new AuthenticationHeaderValue("Basic", Convert.ToBase64String(secureBytes));
-                }
-
-                var json = JsonConvert.SerializeObject(data);
-
-                var content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
-
-                try
-                {
-                    var response = await client.PostAsync(url, content);
-
-                    string responseMessage = await response.Content.ReadAsStringAsync();
-
-                    if (!StatusCodeSuccess(response.StatusCode))
-                    {
-                        throw new Exception(responseMessage);
-                    }
-
-                    try
-                    {
-                        return JsonConvert.DeserializeObject<T>(responseMessage, settings);
-                    }
-                    catch (Exception ex)
-                    {
-                        throw new Exception(ex.Message);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception(ex.Message);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Post call to api without data
-        /// </summary>
-        /// <typeparam name="T">Type to return</typeparam>
-        /// <param name="url">Url to access</param>
-        /// <returns>Type requested</returns>
-        public async Task<T> Post<T>(string url, bool secure = true)
-        {
-            using (var client = new HttpClient())
-            {
-                if (secure)
-                {
-                    var secureBytes = ASCIIEncoding.ASCII.GetBytes($"{_apiCreds.ApiKey}:{_apiCreds.ApiSecret}");
-                    client.DefaultRequestHeaders.Authorization =
-                        new AuthenticationHeaderValue("Basic", Convert.ToBase64String(secureBytes));
-                }
-
-                try
-                {
-                    var response = await client.PostAsync(url, null);
-
-                    string responseMessage = await response.Content.ReadAsStringAsync();
-
-                    if (!StatusCodeSuccess(response.StatusCode))
-                    {
-                        throw new Exception(responseMessage);
-                    }
-
-                    try
-                    {
-                        return JsonConvert.DeserializeObject<T>(responseMessage, settings);
-                    }
-                    catch (Exception ex)
-                    {
-                        throw new Exception(ex.Message);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception(ex.Message);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Check if response was successfully returned
-        /// </summary>
-        /// <param name="code">Status code of response</param>
-        /// <returns>Boolean value of validity of response</returns>
-        private bool StatusCodeSuccess(HttpStatusCode code)
-        {
-            if (code == HttpStatusCode.OK
-                || code == HttpStatusCode.Accepted
-                || code == HttpStatusCode.Created
-                || code == HttpStatusCode.NoContent)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return queryString;
         }
     }
 }
